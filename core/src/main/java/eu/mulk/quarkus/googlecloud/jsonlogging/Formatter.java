@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.jboss.logmanager.ExtFormatter;
 import org.jboss.logmanager.ExtLogRecord;
+import org.jboss.logmanager.MDC;
+import org.jboss.logmanager.NDC;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -155,12 +157,17 @@ public class Formatter extends ExtFormatter {
             logRecord.getLevel().intValue() >= 1000 ? ERROR_EVENT_TYPE : null,
             insertId);
 
+    MDC.clear();
+    NDC.clear();
+
     var b = Objects.requireNonNull(stringBuilder.get());
     b.delete(0, b.length());
     b.append("{");
     entry.json(b);
     b.append("}\n");
-    return b.toString();
+    String output = b.toString();
+    b.setLength(0);
+    return output;
   }
 
   private static LogEntry.@Nullable SourceLocation sourceLocationOf(ExtLogRecord logRecord) {
